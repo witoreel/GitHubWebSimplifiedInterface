@@ -70,6 +70,15 @@ namespace Way2Software2.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.github.com/user.
+        /// </summary>
+        internal static string GitHubLoggedUserURL {
+            get {
+                return ResourceManager.GetString("GitHubLoggedUserURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 8cdc4d11772aaa84675e8a1e947274f7c5763442.
         /// </summary>
         internal static string GitHubOAuthToken {

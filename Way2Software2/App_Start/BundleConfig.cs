@@ -2,8 +2,17 @@
 using System.Web.Optimization;
 
 namespace Way2Software2 {
+
+    /// <summary>
+    /// Classe responsável por cadastrar todos pacotes de scripts utilizados nesa página.
+    /// Os scripts do framework jquery foram cadastrados automaticamente, junto ao template utilizado.
+    /// </summary>
     public class BundleConfig {
-        // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
+
+        /// <summary>
+        /// Registra os pacotes de scripts
+        /// </summary>
+        /// <param name="bundles"></param>
         public static void RegisterBundles(BundleCollection bundles) {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
@@ -15,8 +24,6 @@ namespace Way2Software2 {
                         "~/Scripts/jquery.unobtrusive*",
                         "~/Scripts/jquery.validate*"));
 
-            // Use the development version of Modernizr to develop with and learn from. Then, when you're
-            // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
 

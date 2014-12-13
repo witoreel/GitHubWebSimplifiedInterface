@@ -1,0 +1,50 @@
+﻿@model Way2Software2.Models.GHRepository
+
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">            
+            
+            <hgroup class="title">
+                <h1>@Model.full_name</h1>
+            </hgroup>                        
+            <b>Dono: </b>@Model.Owner.name (@Model.Owner.login)<br>            
+            <b>Linguagem: </b>@Model.language<br>
+            @if (Model.IsFavorite) {
+                <h4 style="float: right;">@Html.ActionLink("Remover dos Favoritos", "DeFavorite", "Main", new { repository_fullname = Model.full_name}, null)</h4>    
+            } else {
+                <h4 style="float: right;">@Html.ActionLink("Adicionar aos Favoritos", "Favorite", "Main", new { repository_fullname = Model.full_name, star_gazers = Model.stargazers_count}, null)</h4>    
+            }                
+            <b>Última atualização: </b>@Model.UpdatedAtFormated<br>
+            <b>Descrição: </b>@Model.description
+            
+        </div>
+    </section>
+}
+
+<hgroup class="title">
+    <h1>Colaboradores</h1>
+</hgroup>
+
+<article>
+    <ul>
+        @foreach(var item in Model.Contributors){
+        <li >
+                     
+            <div>   
+                <hr />      
+                    <img class="user2" src="@item.avatar_url"/>
+                    <div class="user2">
+                        <h3 class="repositories">
+                            <a href="@item.html_url"> github/@item.login</a>            
+                        </h3>
+                        @if (item.email != null && item.email.Length > 0) {
+                            <a href="mailto:@item.email">@item.email</a><br>
+                        }
+                        Usuário desde: @item.CreatedAtFormated
+                    </div>
+                <hr />
+            </div>       
+        </li>        
+        }
+    </ul>
+</article>

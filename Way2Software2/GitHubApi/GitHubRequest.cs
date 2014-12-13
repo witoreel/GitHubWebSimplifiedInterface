@@ -11,22 +11,38 @@ using Way2Software2.Properties;
 
 namespace WaySoftware2.GitHubApi {
 
-
+    /// <summary>
+    /// Classe responsável por realizar as requisições de dados com a API do GitHub.
+    /// Consiste na formatação das URL's e na serialização do JSON de retorno em objetos de modelo.
+    /// </summary>
     public class GitHubRequest {
 
+        #region ====== Enumeradores ======
+
+        /// <summary>
+        /// Define os tipos de parâmetros a serem utilizados nas requisições com a API do GitHub
+        /// </summary>
         enum GitHubParameter {
             access_token
         }
 
-        enum GitHubStaticPage {
-            user
-        }
+        #endregion
 
+        #region ====== Métodos Públicos ======
 
+        /// <summary>
+        /// Retorna um modelo de usuário a partir das informações do usuário logado ao github
+        /// </summary>
+        /// <returns>Objeto de modelo de usuário</returns>
         public GHUser LoadLoggedUser() {
-            return GitHubObject<GHUser>(UserURL);
+            return GitHubObject<GHUser>(Resources.GitHubLoggedUserURL);
         }
 
+        /// <summary>
+        /// Retorna uma lista de modelos de usuários, a partir de uma URL que retorne uma lista de usuários.
+        /// </summary>
+        /// <param name="url">URL de retorno de lista de usuários</param>
+        /// <returns>Lista com objetos de modelo de usuários</returns>
         public GHUser[] LoadUsersByURL(string url) {
 
             url = InsertToken(url);
@@ -37,27 +53,49 @@ namespace WaySoftware2.GitHubApi {
             return users;
         }
 
+        /// <summary>
+        /// Retorna um objeto de modelo de usuário a partir da informação de login no GitHub.
+        /// </summary>
+        /// <param name="login">Login do usuário</param>
+        /// <returns>Objeto de modelo de usuário</returns>
         public GHUser LoadUserByLogin(string login) {
-            string url = InsertToken(Resources.GitHubUsersURL + login);            
+            string url = InsertToken(Resources.GitHubUsersURL + login);
             return GitHubObject<GHUser>(url);
         }
 
-
-
-
+        /// <summary>
+        /// Retorna uma lista com objetos de modelo de repositórios, a partir de uma URL que retorne uma lista de repositórios.
+        /// </summary>
+        /// <param name="url">URL de retorno de lista de repositórios</param>
+        /// <returns>Lista com objetos de modelo de repositórios</returns>
         public GHRepository[] LoadRepositoriesByURL(string url) {
             return GitHubObjectArray<GHRepository>(url);
         }
 
+        /// <summary>
+        /// Retorna um objeto de modelo de repositório a partir de seu nome de identificação.
+        /// </summary>
+        /// <param name="fullname">Nome de identificação do repositório</param>
+        /// <returns>Objeto de modelo de repositório</returns>
         public GHRepository LoadRepositoryByFullName(string fullname) {
-            string url = InsertToken(Resources.GitHubRepositoryURL + fullname);            
+            string url = InsertToken(Resources.GitHubRepositoryURL + fullname);
             return GitHubObject<GHRepository>(url);
         }
 
+        /// <summary>
+        /// Retorna um objeto de modelo de repositório a partir de sua URL.
+        /// </summary>
+        /// <param name="url">URL relacionada a um repositório</param>
+        /// <returns>Objeto de modelo de repositório</returns>
         public GHRepository LoadRepositoryByURL(string url) {
             return GitHubObject<GHRepository>(url);
         }
 
+        /// <summary>
+        /// Realiza uma busca por repositórios a partir de uma palavra chave.
+        /// </summary>
+        /// <param name="keyword">Palavra chave de busca</param>
+        /// <returns>Lista com objetos de modelo de repositórios</returns>
         public GHRepository[] SearchRepositoriesByKeyWord(string keyword) {
 
             string url = InsertToken(String.Format(Resources.GitHubRepositorySearchURL, keyword));
@@ -67,26 +105,25 @@ namespace WaySoftware2.GitHubApi {
             json = json.Substring(json.IndexOf("["));
             json = json.Substring(0, json.IndexOf("]") + 1);
 
-            return GitHubObjectArrayByJson<GHRepository>(json);
-        }
-
-
-
-        public string UserURL {
-            get {
-                string url = Resources.GitHubBaseURL;
-                url += GitHubStaticPage.user;
-                return url;
+            GHRepository[] repositories = null;
+            try {
+                repositories = GitHubObjectArrayByJson<GHRepository>(json);
+            } catch {
+                repositories = new GHRepository[] { null };
             }
-
+            return repositories;
         }
 
-        private string StaticParameters {
-            get {
-                return "?" + GitHubParameter.access_token + "=" + Resources.GitHubOAuthToken;
-            }
-        }
+        #endregion
 
+        #region ====== Métodos Privados ======
+
+        /// <summary>
+        /// Converte as informações de um arquivo JSON em um objeto definido de modelo.
+        /// </summary>
+        /// <typeparam name="T">Classe do modelo do objeto a ser obtido</typeparam>
+        /// <param name="json">Texto do JSON obtido do GitHub</param>
+        /// <returns>Objeto de modelo</returns>
         private T Deserialise<T>(string json) {
             DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(T));
             using (MemoryStream stream = new MemoryStream(Encoding.Unicode.GetBytes(json))) {
@@ -95,15 +132,26 @@ namespace WaySoftware2.GitHubApi {
             }
         }
 
-
-        public T GitHubObject<T>(string url) {
+        /// <summary>
+        /// Retorna um objeto de modelo a partir de uma URL do GitHub.
+        /// </summary>
+        /// <typeparam name="T">Classe do modelo do objeto a ser obtido</typeparam>
+        /// <param name="url">URL associada ao objeto no GitHub</param>
+        /// <returns>Objeto de modelo</returns>
+        private T GitHubObject<T>(string url) {
 
             string json = RequestJSON(url);
             return Deserialise<T>(json);
 
         }
 
-        public T[] GitHubObjectArray<T>(string url) {
+        /// <summary>
+        /// Retorna uma lista de objetos de modelo a partir de uma URL de lista do GitHub.
+        /// </summary>
+        /// <typeparam name="T">Classe do modelo do objeto a ser obtido</typeparam>
+        /// <param name="url">URL associada à uma lista de objetos no GitHub</param>
+        /// <returns>Lista de objetos de modelo</returns>
+        private T[] GitHubObjectArray<T>(string url) {
 
             string[] json = JSONRootAsArray(RequestJSON(url));
             T[] objs = new T[json.Length];
@@ -114,7 +162,13 @@ namespace WaySoftware2.GitHubApi {
 
         }
 
-        public T[] GitHubObjectArrayByJson<T>(string js) {
+        /// <summary>
+        /// Retorna uma lista de objetos de modelo a partir de texto no formato JSON de lista.
+        /// </summary>
+        /// <typeparam name="T">Classe do modelo do objeto a ser obtido</typeparam>
+        /// <param name="js">Texto no formato JSON de lista</param>
+        /// <returns>Lista de objetos de modelo</returns>
+        private T[] GitHubObjectArrayByJson<T>(string js) {
 
             if (js == null || js.Length == 0)
                 return new T[0];
@@ -128,34 +182,42 @@ namespace WaySoftware2.GitHubApi {
 
         }
 
-        public string InsertToken(string url) {
-            return url + (url.IndexOf("?") > -1 ? StaticParameters.Replace("?", "&") : StaticParameters);            
+        /// <summary>
+        /// Insere a chave de autorização de um usuário na URL de requisição do GitHub, a fim de aumentar a quantidade de requisições permitidas.
+        /// </summary>
+        /// <param name="url">URL de requisição do GitHub</param>
+        /// <returns>URL de requisição do GitHub, com o token adicionado</returns>
+        private string InsertToken(string url) {
+            string staticParameters = "?" + GitHubParameter.access_token + "=" + Resources.GitHubOAuthToken;
+            return url + (url.IndexOf("?") > -1 ? staticParameters.Replace("?", "&") : staticParameters);
         }
 
-        public string RequestJSON(string url) {
+        /// <summary>
+        /// Retorna um texto no formato JSON a partir de uma requisição ao servidor do GitHub.
+        /// </summary>
+        /// <param name="url">URL de requisição do GitHub</param>
+        /// <returns>Texto no formato JSON</returns>
+        private string RequestJSON(string url) {
 
             url = InsertToken(url);
             string json = "";
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.UserAgent = "gh";
-            try {
-                WebResponse response = request.GetResponse();
-                Stream responseStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
-                json = reader.ReadToEnd();
-            } catch (WebException ex) {
 
-                //IMPLEMENTAR CONTROLE DO ERRO
-                
-                
-                throw;
-            }
+            WebResponse response = request.GetResponse();
+            Stream responseStream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
+            json = reader.ReadToEnd();
 
             return json;
         }
 
-
+        /// <summary>
+        /// Quebra um texto no formato JSON no formato lista, retornando um array com os subtrechos JSON.
+        /// </summary>
+        /// <param name="json">Texto JSON inicial</param>
+        /// <returns>Texto JSON separado em uma lista</returns>
         private string[] JSONRootAsArray(string json) {
 
             string js = json.Trim();
@@ -173,10 +235,10 @@ namespace WaySoftware2.GitHubApi {
                 if (js[i] == '}')
                     brackets--;
                 if (js[i] == ',' && brackets == 0)
-                    comma_indexes.Add(i);                    
+                    comma_indexes.Add(i);
             }
 
-            string[] jss = new string[comma_indexes.Count+1];
+            string[] jss = new string[comma_indexes.Count + 1];
             if (jss.Length > 1) {
                 for (int i = 0; i < jss.Length; i++) {
                     int start_idx = i == 0 ? 1 : comma_indexes[i - 1] + 1;
@@ -192,8 +254,7 @@ namespace WaySoftware2.GitHubApi {
             return jss;
         }
 
-
-
+        #endregion
 
     }
 

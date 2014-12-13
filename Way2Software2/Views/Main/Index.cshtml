@@ -7,8 +7,8 @@
                 <h1>Informações do candidato.</h1>
 
             </hgroup>
-            <img class="avatar" src="@Model.avatar_url"/>
-            <div class="avatar">
+            <img class="user" src="@Model.avatar_url"/>
+            <div class="user">
                 <h3>@Model.name</h3>
                 <a href="@Model.html_url"> github/@Model.login</a><br>
                 <a href="mailto:@Model.email">@Model.email</a><br>
@@ -17,29 +17,26 @@
         </div>
     </section>
 }
+
 <hgroup class="title">
     <h1>Meus repositórios</h1>
 </hgroup>
 
 <article>
-
-    <ul>
-     
+    <ul>     
         @foreach(var item in @Model.Repositories){
         <li >
             <div>   
                 <hr />      
                 <span class="repositories">@item.stargazers_count Estrelas</span>
                 <h3 class="repositories">
-                    @Html.ActionLink(item.name, "Repository", "Home", new { repository_fullname = item.full_name }, null)
+                    @Html.ActionLink(item.name, "Repository", "Main", new { repository_fullname = item.full_name }, null)
                 </h3>   
                 @item.description
                 <hr />
             
             </div>       
-        </li>
-        
+        </li>        
         }
-
     </ul>
 </article>

@@ -381,16 +381,28 @@ aside {
 }
 
 /* MyRepositories */
-img.avatar {
+img.user {
     width: 128px;
     height: 128px;
     float: left;
     margin: 0 10px 10px 0;
 }
 
-div.avatar {
+img.user2 {
+    width: 64px;
+    height: 64px;
+    float: left;
+    margin: 0 10px 10px 0;
+}
+
+div.user {
     height: 128px;
 }
+
+div.user2 {
+    height: 68px;
+}
+
 
 /* Lista de Repositórios */
 h3.repositories {
