@@ -10,8 +10,6 @@ using Way2Software2.Models;
 namespace Way2Software2.Controllers {
     public class HomeController : Controller {
         public ActionResult Index() {
-            ViewBag.Title = "Informações do candidato";
-            ViewBag.SubTitle = "Meus repositórios";
 
             //Carrega informações sobre o usuário
             GitHubRequest request = new GitHubRequest();
@@ -23,10 +21,10 @@ namespace Way2Software2.Controllers {
 
 
 
-        public ActionResult Favorite(string repository_fullname) {
+        public ActionResult Favorite(string repository_fullname, int star_gazers) {
 
             LocalDBContext db = new LocalDBContext();
-            db.Repositories.Add(new LocalRepositoryEntry { name = repository_fullname, favorite = true });
+            db.Repositories.Add(new LocalRepositoryEntry { name = repository_fullname, favorite = true, star_gazers = star_gazers });
             db.SaveChanges();
 
             return RedirectToAction("Repository", "Home", new { repository_fullname = repository_fullname });
@@ -45,30 +43,28 @@ namespace Way2Software2.Controllers {
 
 
         public ActionResult Repository(string repository_fullname) {
-            ViewBag.Title = "Informações do repositório";
-            ViewBag.SubTitle = "Colaboradores";
 
-            //Carrega informações sobre o repositório            
-            LocalDBContext db = new LocalDBContext();
-            LocalRepositoryEntry entity = db.Repositories.FirstOrDefault(u => u.name.CompareTo(repository_fullname) == 0);
-            bool favorite = entity != null ? entity.favorite : false;
-
+            //Carrega informações sobre o repositório                        
             GitHubRequest request = new GitHubRequest();
             Models.GHRepository repository = request.LoadRepositoryByFullName(repository_fullname);
             repository.Owner = request.LoadUserByLogin(repository.owner_login);
             repository.Contributors = request.LoadUsersByURL(repository.contributors_url);
-            repository.IsFavorite = favorite;
+            
+            LocalDBContext db = new LocalDBContext();
+            LocalRepositoryEntry entity = db.Repositories.FirstOrDefault(u => u.name.CompareTo(repository_fullname) == 0);
+            repository.IsFavorite = entity != null ? entity.favorite : false;
+
 
             return View(repository);
         }
 
-        public ActionResult Favorites() {
-            ViewBag.Title = "Repositórios favoritados";
+        public ActionResult Favorites() {            
 
             LocalDBContext db = new LocalDBContext();
             List<GHRepository> repositories = new List<GHRepository>();
             GitHubRequest request = new GitHubRequest();
-            foreach(LocalRepositoryEntry entry in db.Repositories.OrderByDescending(a => a.star_gazers).ToList())
+
+            foreach (LocalRepositoryEntry entry in db.Repositories.OrderByDescending(x => x.star_gazers).ToList())
                 repositories.Add(request.LoadRepositoryByFullName(entry.name));
 
             return View(repositories);

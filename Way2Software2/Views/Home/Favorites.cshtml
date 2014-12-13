@@ -1,7 +1,7 @@
 ﻿@model List<Way2Software2.Models.GHRepository>
 
 <hgroup class="title">
-    <h1>@ViewBag.Title</h1>
+    <h1>Repositórios Favoritos:</h1>
 </hgroup>
 
 <article>
@@ -14,7 +14,7 @@
             <hr />      
             <span class="repositories">@item.stargazers_count Estrelas</span>
             <h3 class="repositories">
-                @Html.ActionLink(item.name, "Repository", "Home", new { repository_fullname = item.html_url }, null)
+                @Html.ActionLink(item.name, "Repository", "Home", new { repository_fullname = item.full_name }, null)
             </h3>   
             @item.full_name
             <hr />
@@ -22,6 +22,9 @@
         </div>       
     </li>
         
+    }
+    @if (Model.Count == 0) {
+        <li ><h3>Nenhum favorito cadastrado.</h3></li >
     }
 
 </ul>

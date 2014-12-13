@@ -12,7 +12,7 @@
             @if (Model.IsFavorite) {
                 <h4 style="float: right;">@Html.ActionLink("Remover dos Favoritos", "DeFavorite", "Home", new { repository_fullname = Model.full_name}, null)</h4>    
             } else {
-                <h4 style="float: right;">@Html.ActionLink("Adicionar aos Favoritos", "Favorite", "Home", new { repository_fullname = Model.full_name}, null)</h4>    
+                <h4 style="float: right;">@Html.ActionLink("Adicionar aos Favoritos", "Favorite", "Home", new { repository_fullname = Model.full_name, star_gazers = Model.stargazers_count}, null)</h4>    
             }                
             <b>Última atualização: </b>@Model.UpdatedAtFormated<br>
             <b>Descrição: </b>@Model.description
@@ -21,7 +21,7 @@
     </section>
 }
 <hgroup class="title">
-    <h1>@ViewBag.SubTitle</h1>
+    <h1>Colaboradores</h1>
 </hgroup>
 
 <ol class="round">
