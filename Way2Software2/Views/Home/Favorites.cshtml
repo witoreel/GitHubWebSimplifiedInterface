@@ -1,17 +1,29 @@
-﻿
+﻿@model List<Way2Software2.Models.GHRepository>
+
 <hgroup class="title">
     <h1>@ViewBag.Title</h1>
 </hgroup>
 
 <article>
-    <p>
-       Aqui serão exibidos os repositórios favoritados pelo usuário.
-    </p>
 
+<ul>
+
+   @foreach(var item in Model){
+    <li >
+        <div>   
+            <hr />      
+            <span class="repositories">@item.stargazers_count Estrelas</span>
+            <h3 class="repositories">
+                @Html.ActionLink(item.name, "Repository", "Home", new { repository_fullname = item.html_url }, null)
+            </h3>   
+            @item.full_name
+            <hr />
+            
+        </div>       
+    </li>
+        
+    }
+
+</ul>
 
 </article>
-
-<aside>
-    <h3>Está aqui caso eu precise</h3>
-    
-</aside>

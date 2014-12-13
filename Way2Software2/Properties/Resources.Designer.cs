@@ -86,5 +86,23 @@ namespace Way2Software2.Properties {
                 return ResourceManager.GetString("GitHubRepositorySearchURL", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.github.com/repos/.
+        /// </summary>
+        internal static string GitHubRepositoryURL {
+            get {
+                return ResourceManager.GetString("GitHubRepositoryURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.github.com/users/.
+        /// </summary>
+        internal static string GitHubUsersURL {
+            get {
+                return ResourceManager.GetString("GitHubUsersURL", resourceCulture);
+            }
+        }
     }
 }

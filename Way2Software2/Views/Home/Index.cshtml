@@ -1,16 +1,18 @@
-﻿@section featured {
+﻿@model Way2Software2.Models.GHUser
+
+@section featured {
     <section class="featured">
         <div class="content-wrapper">
             <hgroup class="title">
                 <h1>@ViewBag.Title.</h1>
 
             </hgroup>
-            <img class="avatar" src="@ViewBag.GitHubUserAvatarURL" align="left"/>
+            <img class="avatar" src="@Model.avatar_url"/>
             <div class="avatar">
-                <h3>@ViewBag.GitHubUserName</h3>
-                <a href="@ViewBag.GitHubHtmlURL"> github/@ViewBag.GitHubUserLogin</a><br>
-                <a href="mailto:@ViewBag.GitHubUserEmail">@ViewBag.GitHubUserEmail</a><br>
-                Usuário desde: @ViewBag.GitHubCreatedAt 
+                <h3>@Model.name</h3>
+                <a href="@Model.html_url"> github/@Model.login</a><br>
+                <a href="mailto:@Model.email">@Model.email</a><br>
+                Usuário desde: @Model.CreatedAtFormated
             </div>
         </div>
     </section>
@@ -19,19 +21,25 @@
     <h1>@ViewBag.SubTitle</h1>
 </hgroup>
 
-<ol class="round">
+<article>
 
-    @foreach(System.Data.DataRow row in ((System.Data.DataTable)ViewBag.DataTable).Rows){
-    <li >
-        <div>   
-            <hr />      
-            <span class="repositories">@row.ItemArray[2].ToString() Estrelas</span>
-            <h3 class="repositories">@row.ItemArray[0].ToString()</h3>   
-            @row.ItemArray[1].ToString()
-            <hr />
-        </div>       
-    </li>
+    <ul>
+     
+        @foreach(var item in @Model.Repositories){
+        <li >
+            <div>   
+                <hr />      
+                <span class="repositories">@item.stargazers_count Estrelas</span>
+                <h3 class="repositories">
+                    @Html.ActionLink(item.name, "Repository", "Home", new { repository_fullname = item.full_name }, null)
+                </h3>   
+                @item.description
+                <hr />
+            
+            </div>       
+        </li>
         
-    }
+        }
 
-</ol>
+    </ul>
+</article>

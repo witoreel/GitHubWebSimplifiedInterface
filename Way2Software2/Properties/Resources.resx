@@ -129,4 +129,12 @@
     <value>https://api.github.com/search/repositories?q={0}&amp;sort=stars&amp;order=desc</value>
     <comment>URL para pesquisar repositórios do GitHub</comment>
   </data>
+  <data name="GitHubRepositoryURL" xml:space="preserve">
+    <value>https://api.github.com/repos/</value>
+    <comment>URLbase para buscar informações de repositórios</comment>
+  </data>
+  <data name="GitHubUsersURL" xml:space="preserve">
+    <value>https://api.github.com/users/</value>
+    <comment>URL base para buscar informações de usuários</comment>
+  </data>
 </root>

@@ -1,4 +1,5 @@
-﻿
+﻿@model List<Way2Software2.Models.GHRepository>
+
 <hgroup class="title">
     <h1>@ViewBag.Title</h1>
 </hgroup>
@@ -10,23 +11,31 @@
     @Html.TextBox("keyword")
     <input type="submit" value="Pesquisar" />
     
-    <ol class="round">
+    <ul>
 
-        @foreach(System.Data.DataRow row in ((System.Data.DataTable)ViewBag.DataTable).Rows){
-        <li >
-            <div>
-                <hr>
-                <span class="repositories">@row.ItemArray[2].ToString() Estrelas</span>
-                <h3 class="repositories">@row.ItemArray[0].ToString()</h3>
-                @row.ItemArray[1].ToString()
-                <hr>                   
-            </div>                 
+        @if (Model != null){
+            foreach(var item in Model){
+            <li >
+                <div>
+                    <hr>
+                    <span class="repositories">@item.stargazers_count Estrelas</span>
+
+                    <h3 class="repositories">
+                         @Html.ActionLink(item.name, "Repository", "Home", new { repository_fullname = item.full_name }, null)
+                    </h3>
+                    @item.description
+                    <hr>                   
+                </div>                 
         
-        </li>
+            </li>
         
-        }
-        <li><h3>@ViewBag.EmptyMsg</h3></li>
-    </ol>
+            }
+            if (@Model.Count == 0){
+               <li><h3>@ViewBag.EmptyMsg</h3></li>
+            }
+        }        
+            
+    </ul>
 }
 </section>
 

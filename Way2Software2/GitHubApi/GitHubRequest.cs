@@ -6,12 +6,13 @@ using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
+using Way2Software2.Models;
 using Way2Software2.Properties;
 
 namespace WaySoftware2.GitHubApi {
 
 
-    public class GitHubJSONRequest {
+    public class GitHubRequest {
 
         enum GitHubParameter {
             access_token
@@ -20,6 +21,56 @@ namespace WaySoftware2.GitHubApi {
         enum GitHubStaticPage {
             user
         }
+
+
+        public GHUser LoadLoggedUser() {
+            return GitHubObject<GHUser>(UserURL);
+        }
+
+        public GHUser[] LoadUsersByURL(string url) {
+
+            url = InsertToken(url);
+            GHUser[] users = GitHubObjectArray<GHUser>(url);
+            for (int i = 0; i < users.Length; i++)
+                users[i] = LoadUserByLogin(users[i].login);
+
+            return users;
+        }
+
+        public GHUser LoadUserByLogin(string login) {
+            string url = InsertToken(Resources.GitHubUsersURL + login);            
+            return GitHubObject<GHUser>(url);
+        }
+
+
+
+
+        public GHRepository[] LoadRepositoriesByURL(string url) {
+            return GitHubObjectArray<GHRepository>(url);
+        }
+
+        public GHRepository LoadRepositoryByFullName(string fullname) {
+            string url = InsertToken(Resources.GitHubRepositoryURL + fullname);            
+            return GitHubObject<GHRepository>(url);
+        }
+
+        public GHRepository LoadRepositoryByURL(string url) {
+            return GitHubObject<GHRepository>(url);
+        }
+
+        public GHRepository[] SearchRepositoriesByKeyWord(string keyword) {
+
+            string url = InsertToken(String.Format(Resources.GitHubRepositorySearchURL, keyword));
+
+            //Coleta o json e identifica a parcela dos items
+            string json = RequestJSON(url);
+            json = json.Substring(json.IndexOf("["));
+            json = json.Substring(0, json.IndexOf("]") + 1);
+
+            return GitHubObjectArrayByJson<GHRepository>(json);
+        }
+
+
 
         public string UserURL {
             get {
@@ -64,6 +115,9 @@ namespace WaySoftware2.GitHubApi {
         }
 
         public T[] GitHubObjectArrayByJson<T>(string js) {
+
+            if (js == null || js.Length == 0)
+                return new T[0];
 
             string[] json = JSONRootAsArray(js);
             T[] objs = new T[json.Length];
