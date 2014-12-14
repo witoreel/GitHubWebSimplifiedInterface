@@ -78,6 +78,9 @@ namespace WaySoftware2.GitHubApi {
         /// <param name="fullname">Nome de identificação do repositório</param>
         /// <returns>Objeto de modelo de repositório</returns>
         public GHRepository LoadRepositoryByFullName(string fullname) {
+            if (fullname == null || fullname.Length == 0)
+                return null;
+
             string url = InsertToken(Resources.GitHubRepositoryURL + fullname);
             return GitHubObject<GHRepository>(url);
         }
@@ -102,16 +105,13 @@ namespace WaySoftware2.GitHubApi {
 
             //Coleta o json e identifica a parcela dos items
             string json = RequestJSON(url);
-            json = json.Substring(json.IndexOf("["));
-            json = json.Substring(0, json.IndexOf("]") + 1);
+            if (json.IndexOf("[") > -1 && json.IndexOf("]") > -1) {
+                json = json.Substring(json.IndexOf("["));
+                json = json.Substring(0, json.IndexOf("]") + 1);
+            } else
+                json = "";
 
-            GHRepository[] repositories = null;
-            try {
-                repositories = GitHubObjectArrayByJson<GHRepository>(json);
-            } catch {
-                repositories = new GHRepository[] { null };
-            }
-            return repositories;
+            return GitHubObjectArrayByJson<GHRepository>(json);
         }
 
         #endregion
@@ -127,7 +127,11 @@ namespace WaySoftware2.GitHubApi {
         private T Deserialise<T>(string json) {
             DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(T));
             using (MemoryStream stream = new MemoryStream(Encoding.Unicode.GetBytes(json))) {
-                T result = (T)deserializer.ReadObject(stream);
+                T result = default(T);
+                try {
+                    result = (T)deserializer.ReadObject(stream);
+                } catch {
+                }
                 return result;
             }
         }
@@ -174,11 +178,14 @@ namespace WaySoftware2.GitHubApi {
                 return new T[0];
 
             string[] json = JSONRootAsArray(js);
-            T[] objs = new T[json.Length];
-            for (int i = 0; i < objs.Length; i++)
-                objs[i] = Deserialise<T>(json[i]);
+            List<T> objs = new List<T>();
+            for (int i = 0; i < json.Length; i++)
+                try {
+                    objs.Add(Deserialise<T>(json[i]));
+                }catch{
+                }
 
-            return objs;
+            return objs.ToArray();
 
         }
 
@@ -205,10 +212,14 @@ namespace WaySoftware2.GitHubApi {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.UserAgent = "gh";
 
-            WebResponse response = request.GetResponse();
-            Stream responseStream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
-            json = reader.ReadToEnd();
+            try {
+                WebResponse response = request.GetResponse();
+                Stream responseStream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
+                json = reader.ReadToEnd();
+            } catch {
+                return "";
+            }
 
             return json;
         }

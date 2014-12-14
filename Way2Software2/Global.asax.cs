@@ -26,5 +26,13 @@ namespace Way2Software2 {
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
 
+        /// <summary>
+        /// Realiza o tratamento dos erros genéricos ocorridos na página, prevenindo assim de ser exibido StackTrace para o usuário.
+        /// </summary>
+        protected void Application_Error() {
+            Server.ClearError();
+            Response.Redirect("/Main/Error");
+        }
+
     }
 }
